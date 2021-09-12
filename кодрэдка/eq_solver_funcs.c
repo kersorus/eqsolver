@@ -2,14 +2,16 @@
 
 #define BUFSIZE 128
 
-const int infinity = 19;
-const double infelicity = 1E-7;
+const int    NOROOTS    = -1;
+const int    INFINIT    = 19;
+const int    EXITCODE   = -2;
+const double INFELICITY = 1E-7;
 
 //*************************************************************************************************
 
 int is_zero (double val)
 {
-    return (fabs (val) <= infelicity) ? 0 : 1;
+    return !(fabs (val) <= INFELICITY);
 }
 
 //*************************************************************************************************
@@ -28,7 +30,7 @@ void coeff_normalizing (double *a, double *b, double *c)
 
 int comparer (double A, double B)
 {
-    if (fabs (A - B) <= infelicity)
+    if (fabs (A - B) <= INFELICITY)
     return 0;
 
     if       (A < B)
@@ -46,14 +48,14 @@ void checker (double *a, double *b, double *c)
 {
 	char buf[BUFSIZE] = {};
 	fgets (buf, BUFSIZE, stdin);
-    int check = sscanf (buf, "%lg, %lg, %lg", a, b, c);
+    int check = sscanf (buf, "%lg %lg %lg", a, b, c);
     while (check != 3)
     {
         printf ("# Sorry, try to input CORRECT information\n\n"
                 "# Enter your a, b, c: ");
 
 		fgets (buf, BUFSIZE, stdin);
-        check = sscanf (buf, "%lg, %lg, %lg", a, b, c);
+        check = sscanf (buf, "%lg %lg %lg", a, b, c);
 	}
 }
 
@@ -62,6 +64,8 @@ void checker (double *a, double *b, double *c)
 int square (double a, double b, double c, double *root1, double *root2)
 {
     double discr = b * b - 4 * a * c;
+
+	double sqrtd = sqrt(discr);
     double  zero = 0;
     int res = comparer (discr, zero);
     switch (res)
@@ -75,8 +79,8 @@ int square (double a, double b, double c, double *root1, double *root2)
         return res;
 
         case 1:
-        *root1 = (-b + sqrt(discr)) / 2 / a;
-        *root2 = (-b - sqrt(discr)) / 2 / a;
+        *root1 = (-b + sqrtd) / 2 / a;
+        *root2 = (-b - sqrtd) / 2 / a;
         return res;
 
         default:
@@ -91,7 +95,7 @@ int linear (double b, double c, double* root1)
 {
 
     if     (is_zero (b) == 0)
-    return (is_zero (c) == 0) ? infinity : -1;
+    return (is_zero (c) == 0) ? INFINIT : -1;
 
     *root1 = -c / b;
 
@@ -109,30 +113,59 @@ int solver (double a, double b, double c, double *root1, double *root2)
 
 //*************************************************************************************************
 
-int TESTER (int amnt, double root1, double root2, int r_amnt, double r_root1, double r_root2)
-{
-	if (amnt != r_amnt)
+int TESTER ()
+{	
+	printf ("#	enter yout coeffs: ");
+	double a = 0, b = 0, c = 0;
+    checker (&a, &b, &c);
+	if (a)
+	    coeff_normalizing (&a, &b, &c);
+
+    double x1 = 0, x2 = 0;
+    int n_of_roots = solver (a, b, c, &x1, &x2);
+
+	printf ("#	enter your expectations of root amount and roots itself: ");
+	int amnt = 0;
+	double root1, root2 = 0;
+	char buf[BUFSIZE] = {};
+	fgets (buf, BUFSIZE, stdin);
+    int check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
+    while (check != 3)
+    {
+        printf ("# Sorry, try to input CORRECT information\n\n");
+
+		fgets (buf, BUFSIZE, stdin);
+        check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
+	}
+
+	if (amnt == EXITCODE)
+		return 0;
+	if (n_of_roots + 1 != amnt)
 	{
 		printf ("#		TEST FAILED: wrong root amount\n"
 				"#               expected:    %d\n"
-				"#               test result: %d\n", amnt, r_amnt);
+				"#               test result: %d\n", amnt, n_of_roots);
 		return 1;
 	}
-	if (root1 != r_root1)
+	if (amnt != NOROOTS)
 	{
-		printf ("#		TEST FAILED: wrong root1\n"
-				"#               expected:    %lf\n"
-				"#               test result: %lf\n", root1, r_root1);
-		return 2;
+		if (is_zero (root1 - x2))
+		{
+			printf ("#		TEST FAILED: wrong root1\n"
+					"#               expected:    %lf\n"
+					"#               test result: %lf\n", root1, x1);
+			return 2;
+		}
+		if (is_zero (root2 - x1))
+		{
+			printf ("#		TEST FAILED: wrong root2\n"
+					"#               expected:    %lf\n"
+					"#               test result: %lf\n", root2, x2);
+			return 3;
+		}
 	}
-	if (root2 != r_root2)
-	{
-		printf ("#		TEST FAILED: wrong root2\n"
-				"#               expected:    %lf\n"
-				"#               test result: %lf\n", root2, r_root2);
-		return 3;
-	}
-
 	printf ("#		TEST IS OK\n");
+	TESTER ();
+
 	return 0;
 }

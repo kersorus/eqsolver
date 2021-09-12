@@ -4,7 +4,7 @@
 
 //*************************************************************************************************
 
-int  TESTER            (int    amnt, double root1, double root2, int r_amnt, double r_root1, double r_root2);
+int  TESTER            ();
 int  is_zero           (double val);
 void coeff_normalizing (double *a, double *b, double *c);
 int  comparer          (double  A, double  B);

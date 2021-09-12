@@ -2,6 +2,9 @@
 
 #define BUFSIZE 128
 
+const int EXITCODEE = -2;
+const int NOROOTSS  = -1;
+
 //*************************************************************************************************
 
 int main()
@@ -9,43 +12,16 @@ int main()
 #ifndef TEST
     printf ("# Equation solver ( square (a * x^2 + b * x + c = 0) version )\n"
             "#	(c) kersorus, 2020-21\n\n");
-#endif
     printf ("#	Enter your a, b, c: ");
 
     double a = 0, b = 0, c = 0;
     checker (&a, &b, &c);
-    coeff_normalizing (&a, &b, &c);
+	if (a)
+	    coeff_normalizing (&a, &b, &c);
 
     double x1 = 0, x2 = 0;
     int n_of_roots = solver (a, b, c, &x1, &x2);
 
-#ifdef TEST
-	printf ("#	too stop dat sheet put root amount = -1\n");
-	printf ("#	too make infinitii put root amount = 20\n");
-	printf ("#	first root is lover then sacond\n");
-	printf ("#	enter your expectations of root amount and roots itself: ");
-
-	int amnt = 0;
-	double root1, root2 = 0;
-	char buf[BUFSIZE] = {};
-	fgets (buf, BUFSIZE, stdin);
-    int check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
-    while (check != 3)
-    {
-        printf ("# Sorry, try to input CORRECT information\n\n");
-
-		fgets (buf, BUFSIZE, stdin);
-        check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
-	}
-	if (amnt == -1)
-		exit (0);
-	if (TESTER (amnt, root1, root2, n_of_roots + 1, x2, x1))
-		return 667;
-
-	main();
-#endif
-
-#ifndef TEST
     printf ("#	Answer: ");
     switch (n_of_roots)
     {
@@ -70,4 +46,13 @@ int main()
         return 1;
     }
 #endif
+
+#ifdef TEST
+	printf ("#	too stop dat sheet put root amount = %d\n", EXITCODEE);
+	printf ("#	too make infinitii put root amount = 20\n");
+	printf ("#	first root is lover then sacond\n");
+	printf ("#	no rotts means amnt = %d and any rotts u wan\n", NOROOTSS);
+	return TESTER ();
+#endif
+	return 0;
 }
