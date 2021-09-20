@@ -7,7 +7,7 @@ const int NOROOTSS  = -1;
 
 //*************************************************************************************************
 
-int main()
+int main(int argc, char *argv[])
 {
 #ifndef TEST
     printf ("# Equation solver ( square (a * x^2 + b * x + c = 0) version )\n"
@@ -48,11 +48,30 @@ int main()
 #endif
 
 #ifdef TEST
+	if (argc == 2)
+	{
+		if (!freopen (argv[1], "r", stdin))
+		{
+			printf ("#	first make TESTFILE");
+			exit (5);
+		}
+	}
+	else
+	{
+		printf ("#	give prog name of test file\n");
+		exit (6);
+	}
+
 	printf ("#	too stop dat sheet put root amount = %d\n", EXITCODEE);
 	printf ("#	too make infinitii put root amount = 20\n");
 	printf ("#	first root is lover then sacond\n");
-	printf ("#	no rotts means amnt = %d and any rotts u wan\n", NOROOTSS);
-	return TESTER ();
+	printf ("#	no rotts means amnt = %d and any rotts u wan\n\n", NOROOTSS);
+
+	int num = 0;
+	TESTER (&num);
+
+	fclose (stdin);
 #endif
+
 	return 0;
 }

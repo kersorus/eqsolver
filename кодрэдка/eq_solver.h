@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 
 //*************************************************************************************************
 
-int  TESTER            ();
+int  TESTER            (int *num);
 int  is_zero           (double val);
 void coeff_normalizing (double *a, double *b, double *c);
 int  comparer          (double  A, double  B);
