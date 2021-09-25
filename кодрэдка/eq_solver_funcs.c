@@ -43,16 +43,16 @@ int is_zero (double val)
 
 void coeff_normalizing (double *a, double *b, double *c)
 {
-	assert (a);
-	assert (b);
-	assert (c);
+    assert (a);
+    assert (b);
+    assert (c);
 
     if (isfinite (*a / *a) == 0) return;
     if (isfinite (*b / *a) && isfinite (*c / *a) == 0) return;
 
     *b = *b / *a; 
-	*c = *c / *a; 
-	*a = 1;
+    *c = *c / *a; 
+    *a = 1;
 }
 
 //*************************************************************************************************
@@ -88,18 +88,18 @@ int comparer (double A, double B)
 
 void checker (double *a, double *b, double *c)
 {
-	assert (a);
-	assert (b);
-	assert (c);
+    assert (a);
+    assert (b);
+    assert (c);
 
-	if (feof (stdin))
-	{
-		printf ("fuck");
-		exit (666);
-	}
+    if (feof (stdin))
+    {
+        printf ("fuck");
+        exit (666);
+    }
 
-	char buf[BUFSIZE] = {};
-	fgets (buf, BUFSIZE, stdin);
+    char buf[BUFSIZE] = {};
+    fgets (buf, BUFSIZE, stdin);
     int check = sscanf (buf, "%lg %lg %lg", a, b, c);
 #ifndef TEST
     while (check != 3)
@@ -107,13 +107,13 @@ void checker (double *a, double *b, double *c)
         printf ("# Sorry, try to input CORRECT information\n\n"
                 "# Enter your a, b, c: ");
 
-		fgets (buf, BUFSIZE, stdin);
+        fgets (buf, BUFSIZE, stdin);
         check = sscanf (buf, "%lg %lg %lg", a, b, c);
-	}
+    }
 #endif
 #ifdef TEST
-	if (check != 3)
-		exit (0);
+    if (check != 3)
+        exit (0);
 #endif
 }
 
@@ -129,13 +129,13 @@ void checker (double *a, double *b, double *c)
 
 int square (double a, double b, double c, double *root1, double *root2)
 {
-	assert (root1);
-	assert (root2);
-	assert (root1 != root2);
+    assert (root1);
+    assert (root2);
+    assert (root1 != root2);
 
     double discr = b * b - 4 * a * c;
 
-	double sqrtd = sqrt(discr);
+    double sqrtd = sqrt(discr);
     double  zero = 0;
     int res = comparer (discr, zero);
     switch (res)
@@ -171,7 +171,7 @@ int square (double a, double b, double c, double *root1, double *root2)
 
 int linear (double b, double c, double* root1)
 {
-	assert (root1);
+    assert (root1);
 
     if     (is_zero (b) == 0)
     return (is_zero (c) == 0) ? INFINIT : -1;
@@ -193,9 +193,9 @@ int linear (double b, double c, double* root1)
 
 int solver (double a, double b, double c, double *root1, double *root2)
 {
-	assert (root1);
-	assert (root2);
-	assert (root1 != root2);
+    assert (root1);
+    assert (root2);
+    assert (root1 != root2);
 
     if (is_zero(a) == 0)
     return linear(b, c, root1);
@@ -205,65 +205,65 @@ int solver (double a, double b, double c, double *root1, double *root2)
 //*************************************************************************************************
 
 /*!
-	\brief recursive from-file dev's tester-function.
-	\param[in] num - number of test {also is a return value}.
-	do tests for proj from file w name that is given as arg for function main().
+    \brief recursive from-file dev's tester-function.
+    \param[in] num - number of test {also is a return value}.
+    do tests for proj from file w name that is given as arg for function main().
 */
 
 int TESTER (int *num)
 {
-	assert (num);
+    assert (num);
 
-	double a = 0, b = 0, c = 0;
+    double a = 0, b = 0, c = 0;
     checker (&a, &b, &c);
-	if (a)
-	    coeff_normalizing (&a, &b, &c);
+    if (a)
+        coeff_normalizing (&a, &b, &c);
 
     double x1 = 0, x2 = 0;
     int n_of_roots = solver (a, b, c, &x1, &x2);
 
-	int amnt = 0;
-	double root1, root2 = 0;
-	char buf[BUFSIZE] = {};
-	fgets (buf, BUFSIZE, stdin);
+    int amnt = 0;
+    double root1, root2 = 0;
+    char buf[BUFSIZE] = {};
+    fgets (buf, BUFSIZE, stdin);
     int check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
-	if (feof (stdin))
-	{
-		printf ("fuck");
-		exit (6);
-	}
-	if (check != 3)
-    	return 0;
-	if (amnt == EXITCODE)
-		return 0;
-	if (n_of_roots + 1 != amnt)
-	{
-		printf ("#		TEST %d FAILED: wrong root amount\n"
-				"#               expected:    %d\n"
-				"#               test result: %d\n", *num, amnt, n_of_roots);
-		return 1;
-	}
-	if (amnt != NOROOTS)
-	{
-		if (is_zero (root1 - x2))
-		{
-			printf ("#		TEST %d FAILED: wrong root1\n"
-					"#               expected:    %lf\n"
-					"#               test result: %lf\n", *num, root1, x2);
-			return 2;
-		}
-		if (is_zero (root2 - x1))
-		{
-			printf ("#		TEST %d FAILED: wrong root2\n"
-					"#               expected:    %lf\n"
-					"#               test result: %lf\n", *num, root2, x1);
-			return 3;
-		}
-	}
-	printf ("#		TEST %d IS OK\n", *num);
+    if (feof (stdin))
+    {
+        printf ("fuck");
+        exit (6);
+    }
+    if (check != 3)
+        return 0;
+    if (amnt == EXITCODE)
+        return 0;
+    if (n_of_roots + 1 != amnt)
+    {
+        printf ("#        TEST %d FAILED: wrong root amount\n"
+                "#               expected:    %d\n"
+                "#               test result: %d\n", *num, amnt, n_of_roots);
+        return 1;
+    }
+    if (amnt != NOROOTS)
+    {
+        if (is_zero (root1 - x2))
+        {
+            printf ("#        TEST %d FAILED: wrong root1\n"
+                    "#               expected:    %lf\n"
+                    "#               test result: %lf\n", *num, root1, x2);
+            return 2;
+        }
+        if (is_zero (root2 - x1))
+        {
+            printf ("#        TEST %d FAILED: wrong root2\n"
+                    "#               expected:    %lf\n"
+                    "#               test result: %lf\n", *num, root2, x1);
+            return 3;
+        }
+    }
+    printf ("#        TEST %d IS OK\n", *num);
 
-	(*num)++;
-	TESTER (num);
+    (*num)++;
+    TESTER (num);
 
-	return 0;
+    return 0;
 }
