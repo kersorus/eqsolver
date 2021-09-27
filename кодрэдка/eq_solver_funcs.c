@@ -1,19 +1,11 @@
 #include "eq_solver.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <assert.h>
 
 #define BUFSIZE 128
 
-/*!
-     Global parameter responsible for situations with zero number of roots.
-*/
-const int    NOROOTS    = -1;
-/*!
-     Global parameter responsible for situations with infinity number of roots.
-*/
-const int    INFINIT    = 19;
-/*!
-     Global parameter that is exitcode for autotests.
-*/
-const int    EXITCODE   = -2;
 /*!
      Global parameter responsible for double's comparison error.
 */
@@ -28,7 +20,7 @@ const double INFELICITY = 1E-7;
      This function allows you to compare a number with zero.
 */
 
-int is_zero (double val)
+int is_not_zero (double val)
 {
     return !(fabs (val) <= INFELICITY);
 }
@@ -47,7 +39,6 @@ void coeff_normalizing (double *a, double *b, double *c)
     assert (b);
     assert (c);
 
-    if (isfinite (*a / *a) == 0) return;
     if (isfinite (*b / *a) && isfinite (*c / *a) == 0) return;
 
     *b = *b / *a; 
@@ -67,13 +58,12 @@ void coeff_normalizing (double *a, double *b, double *c)
 int comparer (double A, double B)
 {
     if (fabs (A - B) <= INFELICITY)
-    return 0;
+        return  0;
 
-    if       (A < B)
-    return -1;
-
-    if       (A > B)
-    return 1;
+    if (A < B)
+        return -1;
+    else
+        return  1;
 
     return 2;
 }
@@ -92,12 +82,6 @@ void checker (double *a, double *b, double *c)
     assert (b);
     assert (c);
 
-    if (feof (stdin))
-    {
-        printf ("fuck");
-        exit (666);
-    }
-
     char buf[BUFSIZE] = {};
     fgets (buf, BUFSIZE, stdin);
     int check = sscanf (buf, "%lg %lg %lg", a, b, c);
@@ -110,10 +94,9 @@ void checker (double *a, double *b, double *c)
         fgets (buf, BUFSIZE, stdin);
         check = sscanf (buf, "%lg %lg %lg", a, b, c);
     }
-#endif
-#ifdef TEST
+#else
     if (check != 3)
-        exit (0);
+        exit (EXIT_SUCCESS);
 #endif
 }
 
@@ -134,24 +117,23 @@ int square (double a, double b, double c, double *root1, double *root2)
     assert (root1 != root2);
 
     double discr = b * b - 4 * a * c;
-
-    double sqrtd = sqrt(discr);
     double  zero = 0;
     int res = comparer (discr, zero);
+    double sqrtd = sqrt(discr);
     switch (res)
         {
 
         case -1:
-        return res;
+        return res + 1;
 
         case 0:
         *root1 = -b / 2 / a;
-        return res;
+        return res + 1;
 
         case 1:
         *root1 = (-b + sqrtd) / 2 / a;
         *root2 = (-b - sqrtd) / 2 / a;
-        return res;
+        return res + 1;
 
         default:
         printf ("square (): ERROR: discriminant = %lf.\n", discr);
@@ -173,12 +155,12 @@ int linear (double b, double c, double* root1)
 {
     assert (root1);
 
-    if     (is_zero (b) == 0)
-    return (is_zero (c) == 0) ? INFINIT : -1;
+    if     (is_not_zero (b) == 0)
+        return (is_not_zero (c) == 0) ? INFINIT : 0;
 
     *root1 = -c / b;
 
-    return 0;
+    return 1;
 }
 
 //*************************************************************************************************
@@ -197,8 +179,8 @@ int solver (double a, double b, double c, double *root1, double *root2)
     assert (root2);
     assert (root1 != root2);
 
-    if (is_zero(a) == 0)
-    return linear(b, c, root1);
+    if (is_not_zero(a) == 0)
+        return linear(b, c, root1);
     return square(a, b, c, root1, root2);
 }
 
@@ -216,7 +198,7 @@ int TESTER (int *num)
 
     double a = 0, b = 0, c = 0;
     checker (&a, &b, &c);
-    if (a)
+    if (is_not_zero (a))
         coeff_normalizing (&a, &b, &c);
 
     double x1 = 0, x2 = 0;
@@ -227,43 +209,36 @@ int TESTER (int *num)
     char buf[BUFSIZE] = {};
     fgets (buf, BUFSIZE, stdin);
     int check = sscanf (buf, "%d %lg %lg", &amnt, &root1, &root2);
-    if (feof (stdin))
-    {
-        printf ("fuck");
-        exit (6);
-    }
     if (check != 3)
-        return 0;
+        return NOPROBLEMS;
     if (amnt == EXITCODE)
-        return 0;
-    if (n_of_roots + 1 != amnt)
+        return NOPROBLEMS;
+    if (n_of_roots != amnt)
     {
         printf ("#        TEST %d FAILED: wrong root amount\n"
                 "#               expected:    %d\n"
                 "#               test result: %d\n", *num, amnt, n_of_roots);
-        return 1;
+        return WRRAMNT;
     }
     if (amnt != NOROOTS)
     {
-        if (is_zero (root1 - x2))
+        if (is_not_zero (root1 - x2))
         {
             printf ("#        TEST %d FAILED: wrong root1\n"
                     "#               expected:    %lf\n"
                     "#               test result: %lf\n", *num, root1, x2);
-            return 2;
+            return WRROOTONE;
         }
-        if (is_zero (root2 - x1))
+        if (is_not_zero (root2 - x1))
         {
             printf ("#        TEST %d FAILED: wrong root2\n"
                     "#               expected:    %lf\n"
                     "#               test result: %lf\n", *num, root2, x1);
-            return 3;
+            return WRROOTTWO;
         }
     }
     printf ("#        TEST %d IS OK\n", *num);
 
     (*num)++;
     TESTER (num);
-
-    return 0;
 }

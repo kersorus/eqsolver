@@ -1,9 +1,8 @@
 #include "eq_solver.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #define BUFSIZE 128
-
-const int EXITCODEE = -2;
-const int NOROOTSS  = -1;
 
 //*************************************************************************************************
 
@@ -16,7 +15,7 @@ int main(int argc, char *argv[])
 
     double a = 0, b = 0, c = 0;
     checker (&a, &b, &c);
-    if (a)
+    if (is_not_zero (a))
         coeff_normalizing (&a, &b, &c);
 
     double x1 = 0, x2 = 0;
@@ -25,47 +24,46 @@ int main(int argc, char *argv[])
     printf ("#    Answer: ");
     switch (n_of_roots)
     {
-        case -1:
+        case NOROOTS:
         printf ("no roots.\n");
         break;
 
-        case 0:
+        case ONEROOT:
         printf ("one root x1 = %lg.\n", x1);
         break;
 
-        case 1:
+        case TWOROOTS:
         printf ("two roots x1 = %lg, x2 = %lg.\n", x1, x2);
         break;
 
-        case 19:
+        case INFINIT:
         printf ("any number.\n");
         break;
 
         default:
         printf ("main(): ERROR: roots = %d.\n", n_of_roots);
+        printf ("%d\n", TWOROOTS);
         return 1;
     }
-#endif
-
-#ifdef TEST
+#else
     if (argc == 2)
     {
         if (!freopen (argv[1], "r", stdin))
         {
-            printf ("#    first make TESTFILE");
-            exit (5);
+            perror ("#    first make TESTFILE");
+            exit (EXIT_FAILURE);
         }
     }
     else
     {
-        printf ("#    give prog name of test file\n");
-        exit (6);
+        perror ("#    give prog name of test file\n");
+        exit (EXIT_FAILURE);
     }
 
-    printf ("#    too stop dat sheet put root amount = %d\n", EXITCODEE);
-    printf ("#    too make infinitii put root amount = 20\n");
+    printf ("#    too stop dat sheet put root amount = %d\n", EXITCODE);
+    printf ("#    too make infinitii put root amount = %d\n", INFINIT);
     printf ("#    first root is lover then sacond\n");
-    printf ("#    no rotts means amnt = %d and any rotts u wan\n\n", NOROOTSS);
+    printf ("#    no rotts means amnt = %d and any rotts u wan\n\n", NOROOTS);
 
     int num = 0;
     TESTER (&num);
